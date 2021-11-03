@@ -64,6 +64,7 @@ lidar = data['lidar']
 # ax.set_zlim(-1, 5)
 # plt.show()
 
+# CSCE 452 stuff!
 ################################################################################################
 # Remember that our LIDAR data is actually just a set of positions estimated from a separate
 # scan-matching system, so we can insert it into our solver as another position measurement,
@@ -113,14 +114,14 @@ lidar.data = (C_li @ lidar.data.T).T + t_i_li
 
 # part two
 # var_imu_f = 0.10
-# var_imu_w = 0.001
+# var_imu_w = 0.25
 # var_gnss  = 0.01
-# var_lidar = 100.00
+# var_lidar = 100.00 # as the transformed lidar is not accurate, increase the variance of it
 
 # part three
-var_imu_f = 0.10
-var_imu_w = 0.10
-var_gnss = 0.10
+var_imu_f = 0.1
+var_imu_w = 0.25
+var_gnss = 0.1
 var_lidar = 100.00
 
 ################################################################################################
@@ -164,15 +165,14 @@ p_cov_check = p_cov[0]
 # a function for it.
 ################################################################################################
 def measurement_update(sensor_var, p_cov_check, y_k, p_check, v_check, q_check):
-    # 3.1 Compute Kalman Gain
+    # 3.1 Compute Kalman Gain # C2M5L2P13
     R = sensor_var * np.eye(3)
+    K_k = p_cov_check @ h_jac.T @ np.linalg.inv(h_jac @ p_cov_check @ h_jac.T + R)  # 99 93 inv(39 99 93 + 33) = 9by3 matrix
 
-    K_k = p_cov_check @ h_jac.T @ np.linalg.inv(
-        h_jac @ p_cov_check @ h_jac.T + R)  # 99 93 inv(39 99 93 + 33) = 9by3 matrix
-    # 3.2 Compute error state
+    # 3.2 Compute error state # C2M5L2P14
     error_state = np.dot(K_k, (y_k - p_check))
 
-    # 3.3 Correct predicted state
+    # 3.3 Correct predicted state # C2M5L2P15
     delta_p = error_state[0:3]
     delta_v = error_state[3:6]
     delta_phi = error_state[6:9]
@@ -193,7 +193,8 @@ def measurement_update(sensor_var, p_cov_check, y_k, p_check, v_check, q_check):
 # Now that everything is set up, we can start taking in the sensor data and creating estimates
 # for our state in a loop.
 ################################################################################################
-for k in range(1, imu_f.data.shape[0]):  # start at 1 b/c we have initial prediction from gt
+for k in range(1, imu_f.data.shape[0]):  # start at 1 because we have initial prediction from gt
+    # obtain change in time
     delta_t = imu_f.t[k] - imu_f.t[k - 1]
 
     # 1. Update state with IMU inputs 
@@ -201,9 +202,9 @@ for k in range(1, imu_f.data.shape[0]):  # start at 1 b/c we have initial predic
     # rotation_matrix between the nevigation frame and sensor frame C2M3L1P7
     C_ns = Quaternion(*q_est[k - 1]).to_mat()
 
-    # C2M5L2P7 motion model(state)
+    # motion model(state) # C2M5L2P11
     p_est[k] = p_est[k - 1] + delta_t * v_est[k - 1] + (delta_t ** 2 / 2) * (C_ns @ imu_f.data[k - 1] + g)
-    v_est[k] = v_est[k - 1] + delta_t * (C_ns.dot(imu_f.data[k - 1]) + g)
+    v_est[k] = v_est[k - 1] + delta_t * (C_ns @ imu_f.data[k - 1] + g)
     q_est[k] = Quaternion(axis_angle=imu_w.data[k - 1] * delta_t).quat_mult_right(q_est[k - 1])
 
     # 1.1 Linearize the motion model and compute Jacobians
@@ -211,21 +212,21 @@ for k in range(1, imu_f.data.shape[0]):  # start at 1 b/c we have initial predic
     F_k = np.eye(9)
     F_k[0:3, 3:6] = delta_t * np.eye(3)
     # F_k[3:6,6:9] = -skew_symmetric(np.dot(C_ns,imu_f.data[k-1])) * delta_t
-    F_k[3:6, 6:9] = -(C_ns.dot(skew_symmetric(imu_f.data[k - 1].reshape((3, 1)))))
+    F_k[3:6, 6:9] = -(C_ns.dot(skew_symmetric(imu_f.data[k - 1].reshape((3, 1))))) * delta_t
 
     # L_k = np.zeros((9,6))
     # L_k[3:6,0:3] = np.eye(3)
     # L_k[6:9,3:6] = np.eye(3)
 
-    L_k = np.eye(6)
-    L_k[0:6, 0:3] *= delta_t ** 2 * var_imu_f
-    L_k[0:6, 3:6] *= delta_t ** 2 * var_imu_w
+    # L_k = np.eye(6)
+    # L_k[0:6, 0:3] *= delta_t ** 2 * var_imu_f
+    # L_k[0:6, 3:6] *= delta_t ** 2 * var_imu_w
+
+    Q_k = np.eye(6)
+    Q_k[0:3, 0:3] *= delta_t ** 2 * var_imu_f
+    Q_k[3:6, 3:6] *= delta_t ** 2 * var_imu_w
 
     # 2. Propagate uncertainty
-    # constructing the variance of the motion noise
-    # assuming the given var_imu_f and var_imu_w are variance not SD
-    # vfa = var_imu_f**2
-    # vfw = var_imu_w**2
 
     # C2M5L2P8
     # Q_km = delta_t**2 * np.diag([var_imu_f,var_imu_f,var_imu_f,var_imu_w,var_imu_w,var_imu_w])
@@ -233,10 +234,11 @@ for k in range(1, imu_f.data.shape[0]):  # start at 1 b/c we have initial predic
 
     # C2M5L2P12
     # p_cov_check = F_k @ p_cov[k-1] @ F_k.T + L_k @ Q_km @ L_k.T #99 99 99 + 96 66 69 = 9by9 matrix
-    p_cov[k] = F_k @ p_cov[k - 1] @ F_k.T + l_jac @ L_k @ l_jac.T
+    # p_cov[k] = F_k @ p_cov[k - 1] @ F_k.T + l_jac @ L_k @ l_jac.T
+    # p_cov[k] = F_k @ p_cov[k - 1] @ F_k.T + L_k @ l_jac.T
+    p_cov[k] = F_k @ p_cov[k - 1] @ F_k.T + l_jac @ Q_k @ l_jac.T
 
     # 3. Check availability of GNSS and LIDAR measurements
-
     if gnss_i < gnss.t.shape[0]:
         if gnss.t[gnss_i] == imu_f.t[k - 1]:
             p_est[k], v_est[k], q_est[k], p_cov[k] = measurement_update(var_gnss, p_cov[k], gnss.data[gnss_i].T,
@@ -333,19 +335,19 @@ plt.show()
 # p1_indices = [9000, 9400, 9800, 10200, 10600]
 # p1_str = ''
 # for val in p1_indices:
-# for i in range(3):
-# p1_str += '%.3f ' % (p_est[val, i])
-# with open('pt1_submission.txt', 'w') as file:
-# file.write(p1_str)
+#     for i in range(3):
+#         p1_str += '%.3f ' % (p_est[val, i])
+#         with open('pt1_submission.txt', 'w') as file:
+#             file.write(p1_str)
 
 # Pt. 2 submission
 # p2_indices = [9000, 9400, 9800, 10200, 10600]
 # p2_str = ''
 # for val in p2_indices:
-# for i in range(3):
-# p2_str += '%.3f ' % (p_est[val, i])
-# with open('pt2_submission.txt', 'w') as file:
-# file.write(p2_str)
+#     for i in range(3):
+#         p2_str += '%.3f ' % (p_est[val, i])
+#         with open('pt2_submission.txt', 'w') as file:
+#             file.write(p2_str)
 
 # Pt. 3 submission
 p3_indices = [6800, 7600, 8400, 9200, 10000]
