@@ -15,7 +15,7 @@ More details on implementation is provided in implementation_detial.pdf
 ## Tests of reliability and accuracy
 
 ### Test one: normal case
-![part 1A](part 1A.png)
+![part 1A](part_1A.png)
 ![part 1B](part 1B.png)
 ![part 2A](part 2A.png)
 ![part 2B](part 2B.png)
