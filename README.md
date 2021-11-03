@@ -9,21 +9,25 @@ Credit: University of Toronto Institute for Aerospace Studies
 
 ## Installation
 
-Install numpy through numpy
+Install the offcial release of numpy and matplotlib through pip:
 
 ```bash
-pip install numpy
+python -m pip install -U pip
+python -m pip install -U numpy
+python -m pip install -U matplotlib
 ```
 
 ## Compilation & Run
 
 
 ```python
-python Main.py
+python es_ekf.py
 ```
 
-# Reference
-[State Estimation and Localization for Self-Driving Cars by University of Toronto](https://www.coursera.org/learn/state-estimation-localization-self-driving-cars/home/info)\
+## Special Thanks
+Special thanks to [State Estimation and Localization for Self-Driving Cars by University of Toronto](https://www.coursera.org/learn/state-estimation-localization-self-driving-cars/home/info) online course. 
+
+## Reference
 [Vinohith](https://github.com/Vinohith/Self_Driving_Car_specialization)\
 [daniel](https://github.com/daniel-s-ingram/self_driving_cars_specialization)\
 [deepanshut041](https://github.com/deepanshut041/self-driving-car-specialization)\
