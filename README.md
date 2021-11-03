@@ -16,11 +16,11 @@ More details on implementation is provided in implementation_detial.pdf
 
 ### Test one: normal case
 ![part 1A](part_1A.png)
-![part 1B](part 1B.png)
-![part 2A](part 2A.png)
-![part 2B](part 2B.png)
-![part 3A](part 3A.png)
-![part 3B](part 3B.png)
+![part 1B](part_1B.png)
+![part 2A](part_2A.png)
+![part 2B](part_2B.png)
+![part 3A](part_3A.png)
+![part 3B](part_3B.png)
 
 ## Installation
 
