@@ -25,7 +25,7 @@ python es_ekf.py
 ```
 
 ## Special Thanks
-Special thanks to [State Estimation and Localization for Self-Driving Cars by University of Toronto](https://www.coursera.org/learn/state-estimation-localization-self-driving-cars/home/info) online course. 
+Special thanks to [State Estimation and Localization for Self-Driving Cars by University of Toronto](https://www.coursera.org/learn/state-estimation-localization-self-driving-cars/home/info) for providing this excellent online course, and my mentor Dr. Tao from Texas A&M University for advising and sharing this information.
 
 ## Reference
 [Vinohith](https://github.com/Vinohith/Self_Driving_Car_specialization)\
