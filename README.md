@@ -14,13 +14,16 @@ More details on implementation is provided in implementation_detial.pdf
 
 ## Tests of reliability and accuracy
 
-### Test one: normal case
-![part 1A](part_1A.png)
-![part 1B](part_1B.png)
-![part 2A](part_2A.png)
-![part 2B](part_2B.png)
-![part 3A](part_3A.png)
-![part 3B](part_3B.png)
+### Test 1: normal case
+First of all, testing the performance of the estimation with normal sensor measurements. The model is able to provide accurate estimate within error range.\
+<img src="part_1A.png" alt="drawing" width="450"/><img src="part_1B.png" alt="drawing" width="450"/>
+### Test 2: wrong extrinsic calibration
+In orfer to test out the reliability of the state estimation, an intentional error is applied on the rotational matrix when transforming the reference frame of the LIDAR, resulting unreliable LIDAR measurements. By increasing the variance of the LIDAR estimated error, the model adapts and still performs well.\
+<img src="part_2A.png" alt="drawing" width="450"/><img src="part_2B.png" alt="drawing" width="450"/>
+### Test 3: sensor measurement dropout
+A portion of the GNSS and LIDAR data is intentionally erased to test the performance of the estimation when only IMU is available.(like vehicle entering a tunnel)\
+Although there exists a small shift on height estimation due to wrong estimation of pitch angle, the model quickly adjusted state estimation of pitch angle and can perform as expected within reasonable time.\
+<img src="part_3A.png" alt="drawing" width="450"/><img src="part_3B.png" alt="drawing" width="450"/>
 
 ## Installation
 
