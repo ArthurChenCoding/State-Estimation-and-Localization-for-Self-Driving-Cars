@@ -15,7 +15,7 @@ from rotations import angle_normalize, rpy_jacobian_axis_angle, skew_symmetric, 
 # This is where you will load the data from the pickle files. For parts 1 and 2, you will use
 # pt1_data.pkl. For Part 3, you will use pt3_data.pkl.
 ################################################################################################
-with open('data/pt3_data.pkl', 'rb') as file:
+with open('data/pt1_data.pkl', 'rb') as file:
     data = pickle.load(file)
 
 ################################################################################################
@@ -107,10 +107,10 @@ lidar.data = (C_li @ lidar.data.T).T + t_i_li
 # var_lidar = 1.00
 
 # part one
-# var_imu_f = 0.10
-# var_imu_w = 0.25
-# var_gnss  = 0.01
-# var_lidar = 1.00
+var_imu_f = 0.10
+var_imu_w = 0.25
+var_gnss  = 0.01
+var_lidar = 1.00
 
 # part two
 # var_imu_f = 0.10
@@ -119,10 +119,10 @@ lidar.data = (C_li @ lidar.data.T).T + t_i_li
 # var_lidar = 100.00 # as the transformed lidar is not accurate, increase the variance of it
 
 # part three
-var_imu_f = 0.1
-var_imu_w = 0.25
-var_gnss = 0.1
-var_lidar = 100.00
+# var_imu_f = 0.1
+# var_imu_w = 0.25
+# var_gnss = 0.1
+# var_lidar = 100.00
 
 ################################################################################################
 # We can also set up some constants that won't change for any iteration of our solver.
@@ -211,31 +211,13 @@ for k in range(1, imu_f.data.shape[0]):  # start at 1 because we have initial pr
     # C2M5L2P8
     F_k = np.eye(9)
     F_k[0:3, 3:6] = delta_t * np.eye(3)
-    # F_k[3:6,6:9] = -skew_symmetric(np.dot(C_ns,imu_f.data[k-1])) * delta_t
     F_k[3:6, 6:9] = -(C_ns.dot(skew_symmetric(imu_f.data[k - 1].reshape((3, 1))))) * delta_t
-
-    # L_k = np.zeros((9,6))
-    # L_k[3:6,0:3] = np.eye(3)
-    # L_k[6:9,3:6] = np.eye(3)
-
-    # L_k = np.eye(6)
-    # L_k[0:6, 0:3] *= delta_t ** 2 * var_imu_f
-    # L_k[0:6, 3:6] *= delta_t ** 2 * var_imu_w
 
     Q_k = np.eye(6)
     Q_k[0:3, 0:3] *= delta_t ** 2 * var_imu_f
     Q_k[3:6, 3:6] *= delta_t ** 2 * var_imu_w
 
     # 2. Propagate uncertainty
-
-    # C2M5L2P8
-    # Q_km = delta_t**2 * np.diag([var_imu_f,var_imu_f,var_imu_f,var_imu_w,var_imu_w,var_imu_w])
-    # Q_km = delta_t**2 * np.diag([vfa,vfa,vfa,vfw,vfw,vfw])
-
-    # C2M5L2P12
-    # p_cov_check = F_k @ p_cov[k-1] @ F_k.T + L_k @ Q_km @ L_k.T #99 99 99 + 96 66 69 = 9by9 matrix
-    # p_cov[k] = F_k @ p_cov[k - 1] @ F_k.T + l_jac @ L_k @ l_jac.T
-    # p_cov[k] = F_k @ p_cov[k - 1] @ F_k.T + L_k @ l_jac.T
     p_cov[k] = F_k @ p_cov[k - 1] @ F_k.T + l_jac @ Q_k @ l_jac.T
 
     # 3. Check availability of GNSS and LIDAR measurements
@@ -332,13 +314,13 @@ plt.show()
 ################################################################################################
 
 # Pt. 1 submission
-# p1_indices = [9000, 9400, 9800, 10200, 10600]
-# p1_str = ''
-# for val in p1_indices:
-#     for i in range(3):
-#         p1_str += '%.3f ' % (p_est[val, i])
-#         with open('pt1_submission.txt', 'w') as file:
-#             file.write(p1_str)
+p1_indices = [9000, 9400, 9800, 10200, 10600]
+p1_str = ''
+for val in p1_indices:
+    for i in range(3):
+        p1_str += '%.3f ' % (p_est[val, i])
+        with open('pt1_submission.txt', 'w') as file:
+            file.write(p1_str)
 
 # Pt. 2 submission
 # p2_indices = [9000, 9400, 9800, 10200, 10600]
@@ -350,10 +332,10 @@ plt.show()
 #             file.write(p2_str)
 
 # Pt. 3 submission
-p3_indices = [6800, 7600, 8400, 9200, 10000]
-p3_str = ''
-for val in p3_indices:
-    for i in range(3):
-        p3_str += '%.3f ' % (p_est[val, i])
-with open('pt3_submission.txt', 'w') as file:
-    file.write(p3_str)
+# p3_indices = [6800, 7600, 8400, 9200, 10000]
+# p3_str = ''
+# for val in p3_indices:
+#     for i in range(3):
+#         p3_str += '%.3f ' % (p_est[val, i])
+# with open('pt3_submission.txt', 'w') as file:
+#     file.write(p3_str)
