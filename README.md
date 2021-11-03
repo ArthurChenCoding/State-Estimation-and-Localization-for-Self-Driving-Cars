@@ -1,9 +1,8 @@
 # State Estimation and Localization for Self-Driving Cars
 
-Implementation of the Error-State Extended Kalman Filter (ES-EKF) to localize a vehicle using data from the CARLA simulator, more specifically:
-* A Model for typical vehicle localization sensors, including GPS and IMUs
-* An application of extended and unscented Kalman Filters to a vehicle state estimation problem
-* An application of LIDAR scan matching and the Iterative Closest Point algorithm
+State estimation is a vital part of any self-driving car software stack, which relies on the sensor measurements consists of an IMU, a GNSS receiver, and a LiDAR to provide an accurate state estimation. However, since all of sensors provide measurements of varying reliability and at different rates and reference frame, spacial and temporal multisensor calibration is required.
+
+This project implementated the Error-State Extended Kalman Filter (ES-EKF) on state estimation pipeline.
 
 # Reference
 [State Estimation and Localization for Self-Driving Cars by University of Toronto](https://www.coursera.org/learn/state-estimation-localization-self-driving-cars/home/info)\
