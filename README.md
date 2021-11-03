@@ -5,6 +5,22 @@ State estimation is a vital part of any self-driving car software stack, which r
 This project applied the Error-State Extended Kalman Filter (ES-EKF) on state estimation pipeline to enhence the accuracy and reliability of the motion model.
 
 ![flow chart](flow_chart.png)
+
+## Installation
+
+Install numpy through numpy
+
+```bash
+pip install numpy
+```
+
+## Compilation & Run
+
+
+```python
+python Main.py
+```
+
 # Reference
 [State Estimation and Localization for Self-Driving Cars by University of Toronto](https://www.coursera.org/learn/state-estimation-localization-self-driving-cars/home/info)\
 [Vinohith](https://github.com/Vinohith/Self_Driving_Car_specialization)\
