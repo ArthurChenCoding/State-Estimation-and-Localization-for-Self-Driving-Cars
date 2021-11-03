@@ -5,6 +5,7 @@ State estimation is a vital part of any self-driving car software stack, which r
 This project applied the Error-State Extended Kalman Filter (ES-EKF) on state estimation pipeline to enhence the accuracy and reliability of the motion model.
 
 ![flow chart](flow_chart.png)
+Credit: Toronto University for Institution of Aerospace Engineering
 
 ## Installation
 
